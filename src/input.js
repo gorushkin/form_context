@@ -2,9 +2,7 @@ import { Form, Input } from 'antd';
 import { useEffect, useState, forwardRef, useImperativeHandle, createRef, useRef } from 'react';
 import { useStoreContext } from './context';
 
-export const InnerInput = forwardRef((props, ref) => {
-  const { form } = useStoreContext();
-
+export const InnerInput = forwardRef(({ handleChange, name }, ref) => {
   const [value, setValue] = useState('');
 
   const isFieldTouched = useRef(false);
@@ -25,32 +23,33 @@ export const InnerInput = forwardRef((props, ref) => {
   }, [value]);
 
   const onChange = ({ target: { value, name } }) => {
-    form.handleChange({ name, value });
+    handleChange({ name, value });
     isFieldTouched.current = true;
     setValue(value);
   };
 
   return (
-    <Form.Item validateStatus={isValid ? 'success' : 'error'} className='form_item'>
-      <Input {...props} onChange={onChange} value={value} />
+    <Form.Item  validateStatus={isValid ? 'success' : 'error'} className='form_item'>
+      <Input name={name} onChange={onChange} value={value} />
     </Form.Item>
   );
 });
 
-export const MInput = (props) => {
-  const { form } = useStoreContext();
-
+export const MInput = ({ name, rowIndex }) => {
   const ref = createRef();
 
-  form.setRef(props.name, ref);
+  const { form } = useStoreContext();
+  const fieldName = `${rowIndex}_${name}`;
 
   useEffect(() => {
-    form.addField(props.name);
+    if (form) {
+      form.addField(fieldName);
 
-    return () => form.removeField(props.name);
-  }, [form, props.name]);
+      return () => form.removeField(fieldName);
+    }
+  }, [form, fieldName]);
 
-  form.getRefs(props.name);
+  form.setRef(fieldName, ref);
 
-  return <InnerInput ref={ref} {...props} />;
+  return <InnerInput name={fieldName} handleChange={form.handleChange} ref={ref} />;
 };

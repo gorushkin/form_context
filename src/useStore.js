@@ -6,8 +6,13 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
 
   const formRef = useRef();
 
+  const values = useRef({});
+
   const addRow = useCallback(() => {
-    setData((state) => [{ isEditable: true, index: uniqueId(), ...defaultPropertiesValues }, ...state]);
+    setData((state) => [
+      { isEditable: true, index: uniqueId(), ...defaultPropertiesValues },
+      ...state,
+    ]);
   }, [defaultPropertiesValues]);
 
   const resetData = useCallback(() => setData([]), []);
@@ -20,9 +25,28 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
     setData((state) => state.map((item) => (item.index === index ? { ...item, ...props } : item)));
   }, []);
 
-  const handleChange = useCallback(({ value, name }) => {
-    console.log('name: ', name);
-    console.log('value: ', value);
+  const handleChange = useCallback(
+    ({ value, name }) => {
+      values.current = { ...values.current, [name]: value };
+    },
+    [values]
+  );
+
+  const getValues = useCallback(() => {
+    return values.current;
+  }, [values]);
+
+  const finishRow = useCallback((row) => {
+    console.log('row: ', row);
+    console.log('finish');
+  }, []);
+
+  const finishForm = useCallback(() => {
+    formRef.current.handleSave();
+  }, []);
+
+  const resetForm = useCallback(() => {
+    formRef.current.handleReset();
   }, []);
 
   useEffect(() => {
@@ -44,7 +68,9 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
     resetData,
     deleteRow,
     updateRow,
-    formRef,
+    finishRow,
+    finishForm,
+    resetForm,
     form: {
       data,
       addRow,
@@ -52,6 +78,8 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
       resetData,
       deleteRow,
       updateRow,
+      formRef,
+      getValues,
     },
   };
 };

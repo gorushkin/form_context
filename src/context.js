@@ -4,7 +4,6 @@ import {
   useContext,
   useMemo,
   useState,
-  createRef,
   useImperativeHandle,
   forwardRef,
   memo,
@@ -26,14 +25,6 @@ const StoreProvider = forwardRef(({ children, form }, ref) => {
     [refs]
   );
 
-  const getRefs = useCallback(
-    (name) => {
-      console.log(refs.current);
-      // return refs.current[name];
-    },
-    [refs]
-  );
-
   const addField = useCallback((name) => {
     setFields((state) => [...state, name]);
   }, []);
@@ -44,6 +35,7 @@ const StoreProvider = forwardRef(({ children, form }, ref) => {
 
   useImperativeHandle(ref, () => ({
     handleSave: () => {
+      console.log(fields);
       fields.forEach((item) => {
         refs.current[item].current.validateTrigger();
       });
@@ -57,11 +49,27 @@ const StoreProvider = forwardRef(({ children, form }, ref) => {
   }));
 
   const contextValue = useMemo(
-    () => ({ form: { ...form, addField, removeField, refs, setRef, getRefs } }),
-    [addField, form, removeField, refs, setRef, getRefs]
+    () => ({ form: { ...form, addField, removeField, refs, setRef } }),
+    [addField, form, removeField, refs, setRef]
   );
 
   return <StoreContext.Provider value={contextValue}>{children}</StoreContext.Provider>;
 });
 
-export default memo(StoreProvider);
+const StoreWrapper = ({ children, form, onFinish }) => {
+  const submitHandler = (e) => {
+    e.preventDefault();
+    const values = form.getValues();
+    onFinish(values);
+  };
+
+  return (
+    <form onSubmit={submitHandler} id='form'>
+      <StoreProvider form={form} ref={form.formRef}>
+        {children}
+      </StoreProvider>
+    </form>
+  );
+};
+
+export default memo(StoreWrapper);

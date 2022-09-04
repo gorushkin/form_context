@@ -14,21 +14,32 @@ const dataSource = [
 ];
 
 const App = () => {
-  const { data, addRow, handleChange, resetData, deleteRow, updateRow, form, formRef } = useStore({
+  const {
+    data,
+    addRow,
+    handleChange,
+    resetData,
+    deleteRow,
+    updateRow,
+    form,
+    formRef,
+    submitRow,
+    finishForm,
+    resetForm,
+  } = useStore({
     dataSource,
     defaultPropertiesValues: { isClosed: false },
   });
 
   const handleAddClick = () => addRow();
 
-  const handleSaveClick = () => {
-    formRef.current.handleSave();
+  const handleClickSave = () => {
+    submitRow();
   };
 
-  const handleResetClick = () => {
-    formRef.current.handleReset();
-
-  }
+  const handleSubmitForm = (values) => {
+    console.log('value: ', values);
+  };
 
   useEffect(() => {
     addRow();
@@ -42,10 +53,10 @@ const App = () => {
             Add
           </Button>
           <div>
-            <Button onClick={handleResetClick} type='primary'>
+            <Button onClick={resetForm} type='primary'>
               Reset
             </Button>
-            <Button onClick={handleSaveClick} type='primary'>
+            <Button form='form' htmlType="submit" type='primary'>
               Save
             </Button>
           </div>
@@ -53,33 +64,30 @@ const App = () => {
       </Row>
       <Row>
         <Col span={12} offset={6}>
-          <StoreProvider ref={formRef} form={form}>
+          <StoreProvider onFinish={handleSubmitForm} form={form}>
             <List
               size='small'
               bordered
               dataSource={data}
               renderItem={(item) => {
                 if (item.isClosed) return <List.Item>{item.text}</List.Item>;
-                const field = 'text';
-                const name = `${item.index}_${field}`;
-                const props = { name };
-
-                const hanldeDeleteRow = () => {
-                  deleteRow(item.index);
-                };
 
                 return (
                   <Col className='input_wrapper'>
-                    <MInput {...props} />
+                    <MInput name='text' rowIndex={item.index} />
                     <div>
                       <button
-                        onClick={hanldeDeleteRow}
+                        onClick={() => deleteRow(item.index)}
                         className='button button__delete'
                         color='#7cb305'
                       >
                         Delete
                       </button>
-                      <button className='button button__add' color='#7cb305'>
+                      <button
+                        onClick={handleClickSave}
+                        className='button button__add'
+                        color='#7cb305'
+                      >
                         Save
                       </button>
                     </div>
