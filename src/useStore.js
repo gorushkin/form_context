@@ -80,6 +80,8 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
       updateRow,
       formRef,
       getValues,
+      finishForm,
+      finishRow,
     },
   };
 };

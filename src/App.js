@@ -14,19 +14,7 @@ const dataSource = [
 ];
 
 const App = () => {
-  const {
-    data,
-    addRow,
-    handleChange,
-    resetData,
-    deleteRow,
-    updateRow,
-    form,
-    formRef,
-    submitRow,
-    finishForm,
-    resetForm,
-  } = useStore({
+  const { data, addRow, deleteRow, form, submitRow, resetForm } = useStore({
     dataSource,
     defaultPropertiesValues: { isClosed: false },
   });
@@ -56,7 +44,7 @@ const App = () => {
             <Button onClick={resetForm} type='primary'>
               Reset
             </Button>
-            <Button form='form' htmlType="submit" type='primary'>
+            <Button form='form' htmlType='submit' type='primary'>
               Save
             </Button>
           </div>

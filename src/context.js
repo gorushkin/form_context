@@ -60,6 +60,7 @@ const StoreWrapper = ({ children, form, onFinish }) => {
   const submitHandler = (e) => {
     e.preventDefault();
     const values = form.getValues();
+    form.finishForm()
     onFinish(values);
   };
 
