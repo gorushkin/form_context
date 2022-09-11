@@ -2,6 +2,7 @@ import './App.css';
 import { Divider, List, Typography, Card, Row, Col, Button, Form, Input } from 'antd';
 import { useStore } from './useStore';
 import { MInput } from './input';
+import { TestInput } from './testInput';
 import StoreProvider from './context';
 import { useEffect } from 'react';
 
@@ -21,16 +22,16 @@ const App = () => {
 
   const handleAddClick = () => addRow();
 
-  const handleClickSave = () => {
-    submitRow();
+  const handleClickSave = (index) => {
+    submitRow(index);
   };
 
   const handleSubmitForm = (values) => {
-    console.log('value: ', values);
+    // console.log('value: ', values);
   };
 
   useEffect(() => {
-    addRow();
+    // addRow();
   }, []);
 
   return (
@@ -63,18 +64,21 @@ const App = () => {
                 return (
                   <Col className='input_wrapper'>
                     <MInput name='text' rowIndex={item.index} />
+                    {/* <TestInput name='text' rowIndex={item.index} /> */}
                     <div>
                       <button
                         onClick={() => deleteRow(item.index)}
                         className='button button__delete'
                         color='#7cb305'
+                        type='button'
                       >
                         Delete
                       </button>
                       <button
-                        onClick={handleClickSave}
+                        onClick={() => handleClickSave(item.index)}
                         className='button button__add'
                         color='#7cb305'
+                        type='button'
                       >
                         Save
                       </button>

@@ -1,5 +1,14 @@
 import { Form, Input } from 'antd';
-import { useEffect, useState, forwardRef, useImperativeHandle, createRef, useRef } from 'react';
+import {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  createRef,
+  useRef,
+  memo,
+  useLayoutEffect,
+} from 'react';
 import { useStoreContext } from './context';
 
 export const InnerInput = forwardRef(({ handleChange, name }, ref) => {
@@ -16,6 +25,25 @@ export const InnerInput = forwardRef(({ handleChange, name }, ref) => {
       setValue('');
       isFieldTouched.current = false;
     },
+    onSetValues: (value) => {
+      console.log('name: ', name);
+      console.log('value: ', value);
+      setValue(value);
+      // console.log(value);
+      // console.log(name, ':', value);
+      // setValue(name)
+      // if (values[name]) {
+      //   console.log(name);
+      //   console.log(values);
+      // }
+      // setIsValid(true);
+      // isFieldTouched.current = false;
+      // if (values[name]) {
+      //   console.log(name);
+      //   console.log(values[name]);
+      //   setValue(values[name]);
+      // }
+    },
   }));
 
   useEffect(() => {
@@ -29,27 +57,31 @@ export const InnerInput = forwardRef(({ handleChange, name }, ref) => {
   };
 
   return (
-    <Form.Item  validateStatus={isValid ? 'success' : 'error'} className='form_item'>
-      <Input name={name} onChange={onChange} value={value} />
-    </Form.Item>
+    <div>
+      <span>{name}</span>
+      <Form.Item validateStatus={isValid ? 'success' : 'error'} className='form_item'>
+        <Input name={name} onChange={onChange} value={value} />
+      </Form.Item>
+    </div>
   );
 });
 
-export const MInput = ({ name, rowIndex }) => {
+export const MInput = memo(({ name, rowIndex }) => {
   const ref = createRef();
 
   const { form } = useStoreContext();
   const fieldName = `${rowIndex}_${name}`;
 
-  useEffect(() => {
-    if (form) {
-      form.addField(fieldName);
-
-      return () => form.removeField(fieldName);
-    }
-  }, [form, fieldName]);
-
   form.setRef(fieldName, ref);
+  form.addField(fieldName);
+
+  // useEffect(() => {
+  //   if (form) {
+
+  //     return () => form.removeField(fieldName);
+  //   }
+  // }, [form, fieldName]);
+
 
   return <InnerInput name={fieldName} handleChange={form.handleChange} ref={ref} />;
-};
+});

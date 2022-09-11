@@ -3,16 +3,20 @@ import { uniqueId } from 'lodash';
 
 export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValues = {} }) => {
   const [data, setData] = useState([]);
+  const [fields, setFields] = useState([]);
 
   const formRef = useRef();
 
   const values = useRef({});
 
   const addRow = useCallback(() => {
+
     setData((state) => [
       { isEditable: true, index: uniqueId(), ...defaultPropertiesValues },
       ...state,
     ]);
+
+    formRef.current.handleSetValue(values.current);
   }, [defaultPropertiesValues]);
 
   const resetData = useCallback(() => setData([]), []);
@@ -49,6 +53,15 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
     formRef.current.handleReset();
   }, []);
 
+  const submitRow = useCallback((index) => {
+    formRef.current.handleSubmitRow(values.current, index);
+
+  }, []);
+
+  const setValues = useCallback(() => {
+    formRef.current.handleSetValue(values.current);
+  });
+
   useEffect(() => {
     if (!dataSource) return;
 
@@ -68,6 +81,7 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
     resetData,
     deleteRow,
     updateRow,
+    submitRow,
     finishRow,
     finishForm,
     resetForm,
@@ -82,6 +96,8 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
       getValues,
       finishForm,
       finishRow,
+      fields,
+      setFields,
     },
   };
 };
