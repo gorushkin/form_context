@@ -2,9 +2,9 @@ import './App.css';
 import { Divider, List, Typography, Card, Row, Col, Button, Form, Input } from 'antd';
 import { useStore } from './useStore';
 import { MInput } from './input';
-import { TestInput } from './testInput';
 import StoreProvider from './context';
 import { useEffect } from 'react';
+import { useForm } from './useForm';
 
 const dataSource = [
   { text: 'Racing car sprays burning fuel into crowd.' },
@@ -15,23 +15,29 @@ const dataSource = [
 ];
 
 const App = () => {
-  const { data, addRow, deleteRow, form, submitRow, resetForm } = useStore({
+  const { data, addRow, deleteRow } = useStore({
     dataSource,
     defaultPropertiesValues: { isClosed: false },
   });
 
+  const { form } = useForm();
+
   const handleAddClick = () => addRow();
 
-  const handleClickSave = (index) => {
-    submitRow(index);
+  const handleReset = (index) => {
+    form.resetForm();
   };
 
   const handleSubmitForm = (values) => {
     // console.log('value: ', values);
   };
 
+  const handleClickSave = (index) => {
+    console.log(index);
+  };
+
   useEffect(() => {
-    // addRow();
+    addRow();
   }, []);
 
   return (
@@ -42,7 +48,7 @@ const App = () => {
             Add
           </Button>
           <div>
-            <Button onClick={resetForm} type='primary'>
+            <Button onClick={handleReset} type='primary'>
               Reset
             </Button>
             <Button form='form' htmlType='submit' type='primary'>
@@ -53,7 +59,7 @@ const App = () => {
       </Row>
       <Row>
         <Col span={12} offset={6}>
-          <StoreProvider onFinish={handleSubmitForm} form={form}>
+          <StoreProvider form={form} onFinish={handleSubmitForm}>
             <List
               size='small'
               bordered
@@ -64,7 +70,7 @@ const App = () => {
                 return (
                   <Col className='input_wrapper'>
                     <MInput name='text' rowIndex={item.index} />
-                    {/* <TestInput name='text' rowIndex={item.index} /> */}
+                    <MInput name='description' rowIndex={item.index} />
                     <div>
                       <button
                         onClick={() => deleteRow(item.index)}

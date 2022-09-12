@@ -1,15 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  useImperativeHandle,
-  forwardRef,
-  memo,
-  useRef,
-  useEffect,
-} from 'react';
+import { createContext, useContext, useMemo, useImperativeHandle, forwardRef, memo } from 'react';
 
 const StoreContext = createContext({});
 export const useStoreContext = () => useContext(StoreContext);
@@ -17,41 +6,32 @@ export const useStoreContext = () => useContext(StoreContext);
 const StoreProvider = forwardRef(({ children, form }, ref) => {
   useImperativeHandle(ref, () => ({
     handleSave: () => {
-      // fields.current.forEach((item) => {
-      //   refs.current[item].current.validateTrigger();
-      // });
+      console.log('handleSave');
     },
 
-    handleReset: () => {
-      // fields.current.forEach((item) => {
-      //   refs.current[item].current.onFormReset();
-      // });
-    },
+    handleReset: () => {},
 
     handleSetValue: (values) => {
-      form.fields.current.forEach((item) => {
-        console.log(values[item]);
-        console.log(item);
-        // refs.current[item].current.onSetValues(values[item]);
-      });
+      console.log('handleSetValue');
     },
     handleSubmitRow: (values, index) => {
-      console.log('index: ', index);
-      console.log('values: ', values);
+      console.log('handleSubmitRow');
     },
   }));
 
-  const contextValue = useMemo(() => ({ form }), [, form]);
+  const contextValue = useMemo(() => ({ form }), [form]);
 
   return <StoreContext.Provider value={contextValue}>{children}</StoreContext.Provider>;
 });
 
-const StoreWrapper = ({ children, form, onFinish }) => {
+const StoreWrapper = ({ children, onFinish, form }) => {
+
   const submitHandler = (e) => {
     e.preventDefault();
     const values = form.getValues();
-    form.finishForm();
-    onFinish(values);
+    console.log('values: ', values);
+    // form.finishForm();
+    // onFinish(values);
   };
 
   return (

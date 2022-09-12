@@ -1,87 +1,35 @@
 import { Form, Input } from 'antd';
-import {
-  useEffect,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-  createRef,
-  useRef,
-  memo,
-  useLayoutEffect,
-} from 'react';
+import { useEffect, useState, memo } from 'react';
 import { useStoreContext } from './context';
 
-export const InnerInput = forwardRef(({ handleChange, name }, ref) => {
+export const MInput = memo(({ name, rowIndex }) => {
+  const fieldName = `${rowIndex}_${name}`;
+
+  const { form } = useStoreContext();
   const [value, setValue] = useState('');
-
-  const isFieldTouched = useRef(false);
-
   const [isValid, setIsValid] = useState(true);
 
-  useImperativeHandle(ref, () => ({
-    validateTrigger: () => setIsValid(!!value),
-    onFormReset: () => {
-      setIsValid(true);
-      setValue('');
-      isFieldTouched.current = false;
-    },
-    onSetValues: (value) => {
-      console.log('name: ', name);
-      console.log('value: ', value);
-      setValue(value);
-      // console.log(value);
-      // console.log(name, ':', value);
-      // setValue(name)
-      // if (values[name]) {
-      //   console.log(name);
-      //   console.log(values);
-      // }
-      // setIsValid(true);
-      // isFieldTouched.current = false;
-      // if (values[name]) {
-      //   console.log(name);
-      //   console.log(values[name]);
-      //   setValue(values[name]);
-      // }
-    },
-  }));
-
   useEffect(() => {
-    if (isFieldTouched.current) setIsValid(!!value);
+    setIsValid(!!value);
   }, [value]);
 
+  useEffect(() => {
+    setValue(form.getValue(fieldName));
+  }, [form, fieldName]);
+
+  useEffect(() => {}, [value]);
+
   const onChange = ({ target: { value, name } }) => {
-    handleChange({ name, value });
-    isFieldTouched.current = true;
     setValue(value);
+    form.handleChange({ value, name });
   };
 
   return (
     <div>
-      <span>{name}</span>
+      <span>{fieldName}</span>
       <Form.Item validateStatus={isValid ? 'success' : 'error'} className='form_item'>
-        <Input name={name} onChange={onChange} value={value} />
+        <Input value={value} name={fieldName} onChange={onChange} />
       </Form.Item>
     </div>
   );
-});
-
-export const MInput = memo(({ name, rowIndex }) => {
-  const ref = createRef();
-
-  const { form } = useStoreContext();
-  const fieldName = `${rowIndex}_${name}`;
-
-  form.setRef(fieldName, ref);
-  form.addField(fieldName);
-
-  // useEffect(() => {
-  //   if (form) {
-
-  //     return () => form.removeField(fieldName);
-  //   }
-  // }, [form, fieldName]);
-
-
-  return <InnerInput name={fieldName} handleChange={form.handleChange} ref={ref} />;
 });

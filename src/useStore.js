@@ -1,47 +1,14 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { uniqueId } from 'lodash';
 
 export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValues = {} }) => {
   const [data, setData] = useState([]);
-  // const [fields, setFields] = useState([]);
-
-  const formRef = useRef();
-
-  const values = useRef({});
-
-  const refs = useRef();
-
-  const fields = useRef([]);
-
-  const setRef = useCallback(
-    (name, ref) => {
-      refs.current = { ...refs.current, [name]: ref };
-    },
-    [refs]
-  );
-
-  const addField = useCallback(
-    (name) => {
-      if (fields.current.includes(name)) return;
-      fields.current = [name, ...fields.current];
-    },
-    [fields]
-  );
-
-  const removeField = useCallback(
-    (name) => {
-      fields.current = fields.current.filter((item) => item !== name);
-    },
-    [fields]
-  );
 
   const addRow = useCallback(() => {
     setData((state) => [
       { isEditable: true, index: uniqueId(), ...defaultPropertiesValues },
       ...state,
     ]);
-
-    formRef.current.handleSetValue(values.current);
   }, [defaultPropertiesValues]);
 
   const resetData = useCallback(() => setData([]), []);
@@ -53,38 +20,6 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
   const updateRow = useCallback((index, props) => {
     setData((state) => state.map((item) => (item.index === index ? { ...item, ...props } : item)));
   }, []);
-
-  const handleChange = useCallback(
-    ({ value, name }) => {
-      values.current = { ...values.current, [name]: value };
-    },
-    [values]
-  );
-
-  const getValues = useCallback(() => {
-    return values.current;
-  }, [values]);
-
-  const finishRow = useCallback((row) => {
-    console.log('row: ', row);
-    console.log('finish');
-  }, []);
-
-  const finishForm = useCallback(() => {
-    formRef.current.handleSave();
-  }, []);
-
-  const resetForm = useCallback(() => {
-    formRef.current.handleReset();
-  }, []);
-
-  const submitRow = useCallback((index) => {
-    formRef.current.handleSubmitRow(values.current, index);
-  }, []);
-
-  const setValues = useCallback(() => {
-    formRef.current.handleSetValue(values.current);
-  });
 
   useEffect(() => {
     if (!dataSource) return;
@@ -101,30 +36,8 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
   return {
     data,
     addRow,
-    handleChange,
     resetData,
     deleteRow,
     updateRow,
-    submitRow,
-    finishRow,
-    finishForm,
-    resetForm,
-    form: {
-      data,
-      addRow,
-      handleChange,
-      resetData,
-      deleteRow,
-      updateRow,
-      formRef,
-      getValues,
-      finishForm,
-      finishRow,
-      fields,
-      addField,
-      removeField,
-      refs,
-      setRef,
-    },
   };
 };
