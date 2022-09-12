@@ -21,6 +21,12 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
     setData((state) => state.map((item) => (item.index === index ? { ...item, ...props } : item)));
   }, []);
 
+  const handleChange = ({ index, value, name }) => {
+    // setData((state) =>
+    //   state.map((item) => (item.index === index ? { ...item, [name]: value } : item))
+    // );
+  };
+
   useEffect(() => {
     if (!dataSource) return;
 
@@ -39,5 +45,6 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
     resetData,
     deleteRow,
     updateRow,
+    handleChange,
   };
 };

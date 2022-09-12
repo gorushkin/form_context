@@ -15,7 +15,7 @@ const dataSource = [
 ];
 
 const App = () => {
-  const { data, addRow, deleteRow } = useStore({
+  const { data, addRow, deleteRow, handleChange } = useStore({
     dataSource,
     defaultPropertiesValues: { isClosed: false },
   });
@@ -28,9 +28,7 @@ const App = () => {
     form.resetForm();
   };
 
-  const handleSubmitForm = (values) => {
-    // console.log('value: ', values);
-  };
+  const handleSubmitForm = (values) => {};
 
   const handleClickSave = (index) => {
     console.log(index);
@@ -59,7 +57,7 @@ const App = () => {
       </Row>
       <Row>
         <Col span={12} offset={6}>
-          <StoreProvider form={form} onFinish={handleSubmitForm}>
+          <StoreProvider onChange={handleChange} form={form} onFinish={handleSubmitForm}>
             <List
               size='small'
               bordered

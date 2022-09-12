@@ -1,8 +1,22 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import { isEqual } from 'lodash';
 
 export const useForm = () => {
   const formRef = useRef();
   const values = useRef({});
+  const rows = useRef({});
+
+  const handler = useRef();
+
+  const setHandler = useCallback(
+    (func) => {
+      handler.current = func;
+    },
+    [handler]
+  );
+
+  const [rowsValidations, setRowsValidations] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const finishForm = useCallback(() => {
     formRef.current.handleSave();
@@ -21,21 +35,48 @@ export const useForm = () => {
   }, []);
 
   const handleChange = useCallback(
-    ({ value, name }) => {
-      values.current = { ...values.current, [name]: value };
+    ({ value, name, index }) => {
+      handler.current({ value, name, index });
+      const updatedItem = { ...values.current[index], [name]: value };
+      values.current = { ...values.current, [index]: updatedItem };
+      const rowValues = values.current[index];
+      const isRowValid = Object.entries(rowValues).reduce((acc, [key, value]) => {
+        return acc && !!value;
+      }, true);
+
+      rows.current = { ...rows.current, [index]: isRowValid };
+      if (isEqual(rowsValidations, rows.current)) return;
+      setRowsValidations(rows.current);
+      // const qwe = Object.values(rows.current).reduce((acc, value) => acc && !!value, true);
     },
-    [values]
+    [values, rowsValidations, handler]
   );
 
   const getValue = useCallback(
-    (name) => {
-      if (values.current[name]) return values.current[name];
-      values.current = { ...values.current, [name]: undefined };
+    ({ index, name }) => {
+      if (values.current?.[index]?.[name]) return values.current[index][name];
     },
     [values]
   );
 
-  const getValues = useCallback(() => values.current, [values]);
+  const registerField = useCallback(
+    ({ index, name }) => {
+      if (values.current?.[index]?.[name]) return;
+
+      const newItem = values.current?.[index]
+        ? { ...values.current[index], [name]: undefined }
+        : { [name]: undefined };
+
+      values.current = { ...values.current, [index]: newItem };
+      rows.current = { ...rows.current, [index]: false };
+    },
+    [values]
+  );
+
+  const getValues = useCallback(
+    () => ({ values: values.current, rowValidation: rows.current }),
+    [values]
+  );
 
   return {
     form: {
@@ -48,6 +89,8 @@ export const useForm = () => {
       handleChange,
       getValues,
       getValue,
+      registerField,
+      setHandler,
     },
   };
 };

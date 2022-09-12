@@ -1,4 +1,12 @@
-import { createContext, useContext, useMemo, useImperativeHandle, forwardRef, memo } from 'react';
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useImperativeHandle,
+  forwardRef,
+  memo,
+  useEffect,
+} from 'react';
 
 const StoreContext = createContext({});
 export const useStoreContext = () => useContext(StoreContext);
@@ -24,15 +32,16 @@ const StoreProvider = forwardRef(({ children, form }, ref) => {
   return <StoreContext.Provider value={contextValue}>{children}</StoreContext.Provider>;
 });
 
-const StoreWrapper = ({ children, onFinish, form }) => {
-
+const StoreWrapper = ({ children, onFinish, form, onChange }) => {
   const submitHandler = (e) => {
     e.preventDefault();
-    const values = form.getValues();
-    console.log('values: ', values);
-    // form.finishForm();
-    // onFinish(values);
+    const { values, rowValidation } = form.getValues();
+    console.table(values);
   };
+
+  useEffect(() => {
+    form.setHandler(onChange)
+  }, [form, onChange]);
 
   return (
     <form onSubmit={submitHandler} id='form'>

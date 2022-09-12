@@ -2,8 +2,8 @@ import { Form, Input } from 'antd';
 import { useEffect, useState, memo } from 'react';
 import { useStoreContext } from './context';
 
-export const MInput = memo(({ name, rowIndex }) => {
-  const fieldName = `${rowIndex}_${name}`;
+export const MInput = memo(({ name, rowIndex: index }) => {
+  const fieldName = `${index}_${name}`;
 
   const { form } = useStoreContext();
   const [value, setValue] = useState('');
@@ -11,17 +11,18 @@ export const MInput = memo(({ name, rowIndex }) => {
 
   useEffect(() => {
     setIsValid(!!value);
-  }, [value]);
+    form.registerField({ index, name });
+  }, [form, index, name, value]);
 
   useEffect(() => {
-    setValue(form.getValue(fieldName));
-  }, [form, fieldName]);
+    setValue(form.getValue({ index, name }));
+  }, [form, index, name]);
 
   useEffect(() => {}, [value]);
 
-  const onChange = ({ target: { value, name } }) => {
+  const onChange = ({ target: { value } }) => {
     setValue(value);
-    form.handleChange({ value, name });
+    form.handleChange({ index, value, name });
   };
 
   return (
