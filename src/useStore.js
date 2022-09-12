@@ -3,14 +3,39 @@ import { uniqueId } from 'lodash';
 
 export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValues = {} }) => {
   const [data, setData] = useState([]);
-  const [fields, setFields] = useState([]);
+  // const [fields, setFields] = useState([]);
 
   const formRef = useRef();
 
   const values = useRef({});
 
-  const addRow = useCallback(() => {
+  const refs = useRef();
 
+  const fields = useRef([]);
+
+  const setRef = useCallback(
+    (name, ref) => {
+      refs.current = { ...refs.current, [name]: ref };
+    },
+    [refs]
+  );
+
+  const addField = useCallback(
+    (name) => {
+      if (fields.current.includes(name)) return;
+      fields.current = [name, ...fields.current];
+    },
+    [fields]
+  );
+
+  const removeField = useCallback(
+    (name) => {
+      fields.current = fields.current.filter((item) => item !== name);
+    },
+    [fields]
+  );
+
+  const addRow = useCallback(() => {
     setData((state) => [
       { isEditable: true, index: uniqueId(), ...defaultPropertiesValues },
       ...state,
@@ -55,7 +80,6 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
 
   const submitRow = useCallback((index) => {
     formRef.current.handleSubmitRow(values.current, index);
-
   }, []);
 
   const setValues = useCallback(() => {
@@ -97,7 +121,10 @@ export const useStore = ({ dataSource, numberFields = [], defaultPropertiesValue
       finishForm,
       finishRow,
       fields,
-      setFields,
+      addField,
+      removeField,
+      refs,
+      setRef,
     },
   };
 };
